@@ -15,6 +15,5 @@ Major TODO items
 * Implement <picture> support
 * Improved compatibility with existing element styles
 * Upgrade to OpenJPEG 2.x, Emscripten optimizations
-* Implement CSS background-image support
 * Exposed API or data- attribute-driven controls?
 * Support for WebP or JPEG XR

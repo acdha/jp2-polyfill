@@ -3,6 +3,8 @@
 (function () {
     'use strict';
 
+    var renderEvent = new Event('jp2-polyfill-render');
+
     function loadOpenJPEG() {
         var s = document.createElement('script');
 
@@ -27,6 +29,7 @@
         console.log('JPEG-2000 polyfill loading');
 
         updateImageTags();
+        updateBackgroundImages();
 
         console.log('JPEG-2000 polyfill complete');
     }
@@ -42,8 +45,6 @@
                 console.log('Skipping loaded', img);
                 continue;
             }
-
-            console.log(img, img.complete, img.naturalWidth);
 
             var canvas = createCanvasFromUrl(img.src);
             canvas.id = img.id;
@@ -115,10 +116,44 @@
             }
 
             ctx.putImageData(imageRGBA, 0, 0);
+
+            canvas.dispatchEvent(renderEvent);
         };
 
         xhr.send(null);
         return canvas;
+    }
+
+    function updateBackgroundImages() {
+        // There's no efficient way to do this without using something like a class to opt-in
+        // and scanning every element seems a bit wasteful
+        var elements = document.querySelectorAll('.jp2-background-image');
+
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i],
+                url = window.getComputedStyle(element, false).backgroundImage.slice(4, -1);
+
+            url = url.replace(/^(['"])(.+)\1$/, '$2');
+
+            var canvas = createCanvasFromUrl(url);
+
+            // The element must be in the DOM to render but it can be hidden:
+            canvas.style.display = 'none';
+            document.body.appendChild(canvas);
+
+            var id = 'jp2-polyfill-' + i;
+
+            if ('getCSSCanvasContext' in document) {
+                element.style.backgroundImage = '-webkit-canvas(' + id + ')';
+                canvas.addEventListener('jp2-polyfill-render', function () {
+                    var ctx = document.getCSSCanvasContext('2d', id, canvas.width, canvas.height);
+                    ctx.drawImage(canvas, 0, 0);
+                });
+            } else {
+                canvas.id = id;
+                element.style.backgroundImage = '-moz-element(#' + id + ')';
+            }
+        }
     }
 
     // There's no standard way to detect the image formats supported by the current browser
