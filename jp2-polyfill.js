@@ -46,7 +46,7 @@
                 continue;
             }
 
-            var canvas = createCanvasFromUrl(img.src);
+            var canvas = createCanvasFromUrl(img.src, shouldDisplayStats(img));
             canvas.id = img.id;
             canvas.className = img.className;
 
@@ -67,7 +67,7 @@
         }
     }
 
-    function createCanvasFromUrl(src) {
+    function createCanvasFromUrl(src, displayStats) {
         var canvas = document.createElement('canvas'),
             xhr = new XMLHttpRequest(),
             fileType = (src.indexOf('.j2k') > -1) ? 'j2k' : 'jp2';
@@ -85,25 +85,27 @@
 
             var bytes = new Uint8Array(xhr.response),
                 imageRGB, imageRGBA,
-                startTime, endTime;
+                startTime, decodeTime, renderTime;
 
             startTime = Date.now();
             imageRGB = openjpeg(bytes, fileType);
-            endTime = Date.now();
-            console.log('Decode of %s took %dms', src, endTime - startTime);
+            decodeTime = Date.now() - startTime;
+            canvas.polyfillDecodeSeconds = decodeTime / 1000;
 
+            startTime = Date.now();
             canvas.width = imageRGB.width;
             canvas.height = imageRGB.height;
 
-            var ctx = canvas.getContext('2d');
+            var ctx = canvas.getContext('2d'),
+                pixelsPerChannel = imageRGB.width * imageRGB.height;
 
-            var pixelsPerChannel = imageRGB.width * imageRGB.height;
             imageRGBA = ctx.createImageData(imageRGB.width, imageRGB.height);
 
             // FIXME: handle alpha channel
             // FIXME: handle different color depths and layouts
 
-            var i = 0, j = 0;
+            var i = 0,
+                j = 0;
             while (i < imageRGBA.data.length && j < pixelsPerChannel) {
                 imageRGBA.data[i] = imageRGB.data[j]; // R
                 imageRGBA.data[i + 1] = imageRGB.data[j + pixelsPerChannel]; // G
@@ -116,6 +118,25 @@
             }
 
             ctx.putImageData(imageRGBA, 0, 0);
+
+            renderTime = Date.now() - startTime;
+            canvas.polyfillRenderSeconds = renderTime / 1000;
+
+            if (!!displayStats) {
+                ctx.miterLimit = 2;
+                ctx.lineJoin = 'circle';
+
+                var message = 'Decode: ' + canvas.polyfillDecodeSeconds.toFixed(2) + 's; ' +
+                              'Render: ' + canvas.polyfillRenderSeconds.toFixed(2) + 's';
+
+                ctx.font = '16px monospace';
+                ctx.fillStyle = '#cccccc';
+                ctx.lineWidth = 3;
+                ctx.strokeText(message, 5, canvas.height - 5, canvas.width);
+                ctx.fillStyle = '#99cc99';
+                ctx.lineWidth = 1;
+                ctx.fillText(message, 5, canvas.height - 5, canvas.width);
+            }
 
             canvas.dispatchEvent(renderEvent);
         };
@@ -135,7 +156,7 @@
 
             url = url.replace(/^(['"])(.+)\1$/, '$2');
 
-            var canvas = createCanvasFromUrl(url);
+            var canvas = createCanvasFromUrl(url, shouldDisplayStats(element));
 
             // The element must be in the DOM to render but it can be hidden:
             canvas.style.display = 'none';
@@ -154,6 +175,10 @@
                 element.style.backgroundImage = '-moz-element(#' + id + ')';
             }
         }
+    }
+
+    function shouldDisplayStats(elem) {
+        return elem.getAttribute('data-display-polyfill-info') == 'true';
     }
 
     // There's no standard way to detect the image formats supported by the current browser

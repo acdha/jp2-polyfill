@@ -19,7 +19,7 @@
 
         <div>
             Here's a good old 1993-style &lt;img&gt; tag displayed
-            <img class="test-element" src="test.jp2" height="100" width="500">
+            <img class="test-element" src="test.jp2" height="100" width="500" data-display-polyfill-info="true">
             inline with a block of text which should still flow around it.
         </div>
 
@@ -27,16 +27,16 @@
             Here's the world in a styled block tag:
         </p>
 
-        <img id="world-map" class="test-element" src="world.jp2" style="border: solid blue 1px;">
+        <img id="world-map" class="test-element" src="world.jp2" style="border: solid blue 1px;" data-display-polyfill-info="true">
 
         <p>
             Here's a 16-bit image:
-            <img class="test-element" src="test-16bit.jp2">
+            <img class="test-element" src="test-16bit.jp2" data-display-polyfill-info="true">
         </p>
 
         <h2>&lt;picture&gt; format detection</h2>
 
-        <picture class="test-element">
+        <picture class="test-element" data-display-polyfill-info="true">
             <source src="simple.webp" type="image/webp">
             <source src="simple.jp2" type="image/jp2">
             <img src="simple.jpg">
@@ -44,7 +44,7 @@
 
         <h2>Background Image</h2>
 
-        <div class="test-element jp2-background-image" style="background: url('test.jp2'); height: 200px; width: 500px">
+        <div class="test-element jp2-background-image" style="background: url('test.jp2'); height: 200px; width: 500px" data-display-polyfill-info="true">
         </div>
 
         <script src="jp2-polyfill.js" type="text/javascript" charset="utf-8"></script>
