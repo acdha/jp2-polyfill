@@ -34,6 +34,18 @@
             <img class="test-element" src="test-16bit.jp2" data-display-polyfill-info="true">
         </p>
 
+        <p>
+            Here's an image scaled in attributes:
+            <img class="test-element" src="test.jp2" height="50" width="250" data-display-polyfill-info="true">
+            <br>
+            and using CSS:
+            <img class="test-element" src="test.jp2" style="height: 50px; width: 250px" data-display-polyfill-info="true">
+        </p>
+
+        <h2>Background Image</h2>
+
+        <div class="test-element jp2-background-image" style="background: url('test.jp2'); height: 200px; width: 500px" data-display-polyfill-info="true">
+        </div>
         <h2>&lt;picture&gt; format detection</h2>
 
         <picture class="test-element" data-display-polyfill-info="true">
@@ -41,11 +53,6 @@
             <source src="simple.jp2" type="image/jp2">
             <img src="simple.jpg">
         </picture>
-
-        <h2>Background Image</h2>
-
-        <div class="test-element jp2-background-image" style="background: url('test.jp2'); height: 200px; width: 500px" data-display-polyfill-info="true">
-        </div>
 
         <script src="jp2-polyfill.js" type="text/javascript" charset="utf-8"></script>
     </body>

@@ -60,6 +60,19 @@
                 canvas.style.display = 'inline';
             }
 
+            // TODO: don't punt on non-pixel measurements:
+            if (img.attributes.height) {
+                canvas.height = parseInt(img.attributes.height.value, 10);
+                canvas.style.height = canvas.height + "px";
+            }
+
+            if (img.attributes.width) {
+                canvas.width = parseInt(img.attributes.width.value, 10);
+                canvas.style.width = canvas.width + "px";
+            }
+
+            // TODO: auto scale if only one dimension is specified
+
             // FIXME: copy computed styles or punt outright?
 
             // img.parentNode.insertBefore(canvas, img.nextSibling);
